@@ -2,6 +2,10 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.4-beta] - 2024-12-21
+### Bug Fixes
+- Dispose decorations, enchance performance
+
 ## [0.1.3-beta] - 2024-12-21
 ### Added
 - Lower the vscode version requirement 

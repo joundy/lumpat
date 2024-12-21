@@ -9,43 +9,50 @@ import {
 import { BACKGROUND_COLOR, CHARS, REGEX } from "./consts";
 import { VisibleTexts } from "./types";
 
-export function activate(context: vscode.ExtensionContext) {
-  let charMap: {
-    [keyof: string]: vscode.Position;
-  } = {};
-  let listenedChar = "";
-  let maxCharacter = 0;
-  function pushChar(char: string, position: vscode.Position) {
-    charMap[char] = position;
-    maxCharacter = Math.max(maxCharacter, char.length);
-  }
+const backgroundCharDec = vscode.window.createTextEditorDecorationType({
+  color: BACKGROUND_COLOR,
+});
 
-  const backgroundCharDec = vscode.window.createTextEditorDecorationType({
-    color: BACKGROUND_COLOR,
-  });
+let charMap: {
+  [keyof: string]: vscode.Position;
+} = {};
+let listenedChar = "";
+let maxCharacter = 0;
+function pushChar(char: string, position: vscode.Position) {
+  charMap[char] = position;
+  maxCharacter = Math.max(maxCharacter, char.length);
+}
 
-  let isEnabled = false;
-  function setEnabled(enabled: boolean) {
-    isEnabled = enabled;
-    vscode.commands.executeCommand("setContext", "lumpat.jump-mode", enabled);
-  }
+let decorations: vscode.TextEditorDecorationType[] = [];
 
-  let decorations: vscode.TextEditorDecorationType[] = [];
+let isEnabled = false;
+function setEnabled(enabled: boolean) {
+  isEnabled = enabled;
+  vscode.commands.executeCommand("setContext", "lumpat.jump-mode", enabled);
+}
 
-  function reset(editor: vscode.TextEditor) {
-    setEnabled(false);
+function reset(editor?: vscode.TextEditor) {
+  setEnabled(false);
 
+  if (editor) {
     editor.setDecorations(backgroundCharDec, []);
-
     for (let i = 0; i < decorations.length; i++) {
       editor.setDecorations(decorations[i], []);
     }
-    decorations = [];
-    charMap = {};
-    listenedChar = "";
-    maxCharacter = 0;
   }
 
+  backgroundCharDec.dispose();
+  for (let i = 0; i < decorations.length; i++) {
+    decorations[i].dispose();
+  }
+  decorations = [];
+
+  charMap = {};
+  listenedChar = "";
+  maxCharacter = 0;
+}
+
+export function activate(context: vscode.ExtensionContext) {
   function setTextsColor(
     editor: vscode.TextEditor,
     visibleTexts: VisibleTexts,
@@ -195,4 +202,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-export function deactivate() {}
+export function deactivate() {
+  const editor = vscode.window.activeTextEditor;
+  reset(editor);
+}
