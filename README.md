@@ -20,19 +20,15 @@ Install through VS Code Marketplace (coming soon).
 
 ## TODO
 
-- [ ] Add customizable keybindings
-- [ ] Support for multi-character jump sequences
-- [ ] Add different jump modes (word start, word end, line start)
-- [ ] Implement case-sensitive matching option
-- [ ] Add visual selection mode while jumping
-- [ ] Improve performance for large files
-- [ ] Add configuration for highlight colors
-- [ ] Support for regular expression based jumps
+- [ ] Configurable settings
 - [ ] Support jumping across multiple windows
+- [ ] Add different jump modes (word start, word end, line start)
+- [ ] Improve performance for large files
+- [ ] Implement case-sensitive matching option
 
 ## Status
 
-This is currently in beta (v0.1.0-beta). Please report any issues you encounter!
+This is currently in beta (v0.1.1-beta). Please report any issues you encounter!
 
 ## Acknowledgments
 
