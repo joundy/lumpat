@@ -32,7 +32,7 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 ## Status
 
-This is currently in beta (v0.1.2-beta). Please report any issues you encounter!
+This is currently in beta (v0.1.3-beta). Please report any issues you encounter!
 
 ## Acknowledgments
 
