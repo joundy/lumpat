@@ -3,6 +3,8 @@
 "Lumpat" or "Mlumpat" in Javanese means "jump."\
 A VS Code extension that enhances text navigation with quick jump-to-highlight functionality.
 
+![lumpat](https://github.com/user-attachments/assets/41543714-80be-43ef-87ef-903ab46bb109)
+
 ## Features
 
 - Quick navigation through text using keyboard shortcuts
