@@ -10,6 +10,7 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 - Quick navigation through text using keyboard shortcuts
 - Visual highlighting system that shows jump targets
 - Efficient movement without using the mouse
+- Support vim extension
 
 ## Installation
 
