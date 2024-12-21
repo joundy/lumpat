@@ -14,7 +14,7 @@ Install through VS Code Marketplace (coming soon).
 
 ## Usage
 
-1. Trigger the jump mode using the keyboard shortcut
+1. Trigger the jump mode using `Shift + Enter` (or run command `lumpat.jump`)
 2. Visual highlights will appear in your text
 3. Type the highlighted character to jump to that location
 
