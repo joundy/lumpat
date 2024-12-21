@@ -82,12 +82,12 @@ export function activate(context: vscode.ExtensionContext) {
     };
   }
 
-  function createDecoration(char: string) {
+  function createDecoration(char: string, isPriority: boolean = false) {
     return vscode.window.createTextEditorDecorationType({
       textDecoration: "none; display: none",
       after: {
         contentText: char,
-        color: "#f70078",
+        color: isPriority ? "#f70078" : "#0db3d0",
         fontWeight: "bold",
       },
     });
@@ -127,20 +127,35 @@ export function activate(context: vscode.ExtensionContext) {
     const middleCharIndex = Math.floor(chars.length / 2);
     const positionProrityStart = Math.max(closestIndex - middleCharIndex, 0);
 
-    for (let i = positionProrityStart; i < positions.length; i++) {
-      if (i - positionProrityStart >= chars.length) {
-        break;
+    for (let i = 0; i < positions.length; i++) {
+      if (
+        i >= positionProrityStart &&
+        i < positionProrityStart + chars.length
+      ) {
+        const decoration = createDecoration(
+          chars[i - positionProrityStart],
+          true,
+        );
+        decorations.push(decoration);
+
+        const range = new vscode.Range(
+          positions[i],
+          positions[i].translate(0, chars[i - positionProrityStart].length),
+        );
+        editor.setDecorations(decoration, [range]);
+        charMap[chars[i - positionProrityStart]] = positions[i];
+
+        continue;
       }
 
-      const decoration = createDecoration(chars[i - positionProrityStart]);
+      const decoration = createDecoration("ZZ");
       decorations.push(decoration);
 
       const range = new vscode.Range(
         positions[i],
-        positions[i].translate(0, chars[i - positionProrityStart].length),
+        positions[i].translate(0, 2),
       );
       editor.setDecorations(decoration, [range]);
-      charMap[chars[i - positionProrityStart]] = positions[i];
     }
   }
 
