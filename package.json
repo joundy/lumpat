@@ -1,6 +1,8 @@
 {
   "name": "lumpat",
   "displayName": "lumpat",
+  "publisher": "Joundy",
+  "repository": "https://github.com/joundy/lumpat",
   "description": "An easy motion extension",
   "version": "0.0.1",
   "engines": {

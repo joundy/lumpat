@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
     maxCharacter = 0;
   }
 
-  function setWordsColor(
+  function setTextsColor(
     editor: vscode.TextEditor,
     visibleTexts: VisibleTexts,
     activePosition: vscode.Position,
@@ -49,15 +49,15 @@ export function activate(context: vscode.ExtensionContext) {
     const positions: vscode.Position[] = [];
 
     for (let i = 0; i < visibleTexts.texts.length; i++) {
-      const regexWords = visibleTexts.texts[i].matchAll(REGEX);
-      for (const word of regexWords) {
-        if (word[0] === "") {
+      const regexTexts = visibleTexts.texts[i].matchAll(REGEX);
+      for (const text of regexTexts) {
+        if (text[0] === "") {
           continue;
         }
 
         let position = new vscode.Position(
           i + visibleTexts.start.line,
-          word.index,
+          text.index,
         );
         positions.push(position);
       }
@@ -130,7 +130,7 @@ export function activate(context: vscode.ExtensionContext) {
     const activePosition = editor.selection.active;
 
     setBackgroundColor(editor, visibleTexts);
-    setWordsColor(editor, visibleTexts, activePosition);
+    setTextsColor(editor, visibleTexts, activePosition);
     isEnabled = true;
   }
 
