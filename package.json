@@ -19,6 +19,138 @@
         "command": "lumpat.jump",
         "title": "Highlight Jump Texts"
       }
+    ],
+    "keybindings": [
+      {
+        "command": "lumpat.a",
+        "key": "a",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.b",
+        "key": "b",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.c",
+        "key": "c",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.d",
+        "key": "d",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.e",
+        "key": "e",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.f",
+        "key": "f",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.g",
+        "key": "g",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.h",
+        "key": "h",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.i",
+        "key": "i",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.j",
+        "key": "j",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.k",
+        "key": "k",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.l",
+        "key": "l",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.m",
+        "key": "m",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.n",
+        "key": "n",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.o",
+        "key": "o",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.p",
+        "key": "p",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.q",
+        "key": "q",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.r",
+        "key": "r",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.s",
+        "key": "s",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.t",
+        "key": "t",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.u",
+        "key": "u",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.v",
+        "key": "v",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.w",
+        "key": "w",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.x",
+        "key": "x",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.y",
+        "key": "y",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      },
+      {
+        "command": "lumpat.z",
+        "key": "z",
+        "when": "lumpat.jump-mode && editorTextFocus"
+      }
     ]
   },
   "scripts": {

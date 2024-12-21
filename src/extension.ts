@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   let charMap: {
     [keyof: string]: vscode.Position;
   } = {};
-  let listenChar = "";
+  let listenedChar = "";
   let maxCharacter = 0;
   function pushChar(char: string, position: vscode.Position) {
     charMap[char] = position;
@@ -25,11 +25,16 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   let isEnabled = false;
+  function setEnabled(enabled: boolean) {
+    isEnabled = enabled;
+    vscode.commands.executeCommand("setContext", "lumpat.jump-mode", enabled);
+  }
 
   let decorations: vscode.TextEditorDecorationType[] = [];
 
   function reset(editor: vscode.TextEditor) {
-    isEnabled = false;
+    setEnabled(false);
+
     editor.setDecorations(backgroundCharDec, []);
 
     for (let i = 0; i < decorations.length; i++) {
@@ -37,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
     decorations = [];
     charMap = {};
-    listenChar = "";
+    listenedChar = "";
     maxCharacter = 0;
   }
 
@@ -131,7 +136,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     setBackgroundColor(editor, visibleTexts);
     setTextsColor(editor, visibleTexts, activePosition);
-    isEnabled = true;
+
+    setEnabled(true);
   }
 
   const disposable = vscode.commands.registerCommand(
@@ -147,13 +153,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
-  const typeDisposable = vscode.commands.registerCommand("type", (args) => {
-    if (!isEnabled) {
-      vscode.commands.executeCommand("default:type", args);
-      return;
-    }
-    if (listenChar.length > maxCharacter) {
-      vscode.commands.executeCommand("default:type", args);
+  function listenChar(key: string) {
+    if (listenedChar.length > maxCharacter) {
+      setEnabled(false);
       return;
     }
 
@@ -162,30 +164,36 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
 
-    const text = args.text;
-    listenChar += text;
+    listenedChar += key;
 
-    if (charMap[listenChar]) {
+    if (charMap[listenedChar]) {
       const selection = new vscode.Selection(
-        charMap[listenChar],
-        charMap[listenChar],
+        charMap[listenedChar],
+        charMap[listenedChar],
       );
 
       editor.selection = selection;
       editor.revealRange(
-        new vscode.Range(charMap[listenChar], charMap[listenChar]),
+        new vscode.Range(charMap[listenedChar], charMap[listenedChar]),
       );
     } else {
-      if (listenChar.length < maxCharacter) {
+      if (listenedChar.length < maxCharacter) {
         // listen next character
         return;
       }
     }
 
     reset(editor);
-  });
+  }
 
-  context.subscriptions.push(typeDisposable);
+  context.subscriptions.push(
+    ...CHARS.map((char) => {
+      console.log(`lumpat.${char}`);
+      return vscode.commands.registerCommand(`lumpat.${char}`, () =>
+        listenChar(char),
+      );
+    }),
+  );
 }
 
-export function deactivate() { }
+export function deactivate() {}
