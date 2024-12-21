@@ -2,6 +2,10 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.5-beta] - 2024-12-21
+### Bug Fixes
+- Dispose background decoration when deactivated only
+
 ## [0.1.4-beta] - 2024-12-21
 ### Bug Fixes
 - Dispose decorations, enchance performance

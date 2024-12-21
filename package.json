@@ -7,7 +7,7 @@
     "url": "https://github.com/joundy/lumpat"
   },
   "description": "A VS Code extension that enhances text navigation with quick jump-to-highlight functionality (vim easy motion like).",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "engines": {
     "vscode": "^1.85.0"
   },

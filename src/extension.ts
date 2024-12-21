@@ -31,7 +31,7 @@ function setEnabled(enabled: boolean) {
   vscode.commands.executeCommand("setContext", "lumpat.jump-mode", enabled);
 }
 
-function reset(editor?: vscode.TextEditor) {
+function reset(editor?: vscode.TextEditor, deactivate = false) {
   setEnabled(false);
 
   if (editor) {
@@ -41,7 +41,10 @@ function reset(editor?: vscode.TextEditor) {
     }
   }
 
-  backgroundCharDec.dispose();
+  if (deactivate) {
+    backgroundCharDec.dispose();
+  }
+
   for (let i = 0; i < decorations.length; i++) {
     decorations[i].dispose();
   }
@@ -204,5 +207,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   const editor = vscode.window.activeTextEditor;
-  reset(editor);
+  reset(editor, true);
 }
