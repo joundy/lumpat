@@ -1,9 +1,12 @@
 {
-  "name": "lumpat",
+  "name": "Lumpat",
   "displayName": "lumpat",
   "publisher": "Joundy",
-  "repository": "https://github.com/joundy/lumpat",
-  "description": "An easy motion extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joundy/lumpat"
+  },
+  "description": "A VS Code extension that enhances text navigation with quick jump-to-highlight functionality (vim easy motion like).",
   "version": "0.1.1",
   "engines": {
     "vscode": "^1.96.0"
@@ -11,7 +14,22 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "keywords": [
+    "jumpy",
+    "jumpy2",
+    "jump",
+    "mouseless",
+    "cursor",
+    "vim",
+    "nvim",
+    "neovim",
+    "hop",
+    "sneak",
+    "easy motion"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

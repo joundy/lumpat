@@ -1,5 +1,6 @@
 # Lumpat
 
+"Lumpat" or "Mlumpat" in Javanese means "jump."\
 A VS Code extension that enhances text navigation with quick jump-to-highlight functionality.
 
 ## Features
@@ -10,7 +11,7 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 ## Installation
 
-Install through VS Code Marketplace (coming soon).
+[Marketplace](https://marketplace.visualstudio.com/items?itemName=Joundy.lumpat)
 
 ## Usage
 
@@ -33,6 +34,7 @@ This is currently in beta (v0.1.1-beta). Please report any issues you encounter!
 ## Acknowledgments
 
 This extension is highly inspired by:
+
 - [hop.nvim](https://github.com/hadronized/hop.nvim)
 - [jumpy2](https://github.com/DavidLGoldberg/jumpy2)
 
