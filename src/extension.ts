@@ -1,79 +1,13 @@
 import * as vscode from "vscode";
-
-const chars = "fjkasdlghqwertyuiopzxcvbnm".split("");
-
-// regex for match chars positions
-const regex = /(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$/g;
-
-function shiftPermutations(
-  arr: string[],
-  startIndex: number,
-  endIndex: number,
-  targetIndex: number,
-) {
-  const toShift = arr.slice(startIndex, endIndex + 1);
-  arr.splice(startIndex, endIndex - startIndex + 1);
-  arr.splice(targetIndex, 0, ...toShift);
-  return arr;
-}
-
-const generateMax2Permutations = (
-  chars: string[],
-  total = 10,
-): {
-  priorityIndex: number;
-
-  hints: string[];
-} => {
-  const results = [];
-
-  if (total < chars.length) {
-    return {
-      priorityIndex: 0,
-      hints: chars.slice(0, total),
-    };
-  }
-
-  for (let i = 0; i < chars.length; i++) {
-    for (let j = 0; j < chars.length; j++) {
-      results.push(chars[i] + chars[j]);
-
-      if (results.length + chars.length - i - 1 === total) {
-        return {
-          priorityIndex: results.length,
-          hints: results.concat(chars.slice(i + 1)),
-        };
-      }
-
-      if (results.length === total) {
-        return {
-          priorityIndex: results.length,
-          hints: results,
-        };
-      }
-    }
-  }
-
-  return {
-    priorityIndex: -1,
-    hints: results,
-  };
-};
-
-// expensive, TODO: optimize this function
-const findClosestIndex = (
-  target: vscode.Position,
-  positions: vscode.Position[],
-): number =>
-  positions.reduce(
-    (closest, pos, i) => {
-      const diff =
-        Math.abs(target.line - pos.line) * 1000 +
-        Math.abs(target.character - pos.character);
-      return diff < closest.diff ? { diff, index: i } : closest;
-    },
-    { diff: Infinity, index: -1 },
-  ).index;
+import {
+  createDecoration,
+  findClosestIndex,
+  generateMax2Permutations,
+  getVisibleTexts,
+  shiftPermutations,
+} from "./utils";
+import { BACKGROUND_COLOR, CHARS, REGEX } from "./consts";
+import { VisibleTexts } from "./types";
 
 export function activate(context: vscode.ExtensionContext) {
   let charMap: {
@@ -87,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   const backgroundCharDec = vscode.window.createTextEditorDecorationType({
-    color: "#515878",
+    color: BACKGROUND_COLOR,
   });
 
   let isEnabled = false;
@@ -107,59 +41,6 @@ export function activate(context: vscode.ExtensionContext) {
     maxCharacter = 0;
   }
 
-  type VisibleTexts = {
-    texts: string[];
-    start: {
-      line: number;
-      character: number;
-    };
-    end: {
-      line: number;
-      character: number;
-    };
-  };
-
-  function getVisibleTexts(editor: vscode.TextEditor): VisibleTexts | null {
-    const visibleRanges = editor.visibleRanges;
-    let visibleTexts: string[] = [];
-
-    if (visibleRanges.length === 0) {
-      return null;
-    }
-
-    for (
-      let i = visibleRanges[0].start.line;
-      i <= visibleRanges[0].end.line;
-      i++
-    ) {
-      const text = editor.document.lineAt(i).text;
-      visibleTexts.push(text);
-    }
-
-    return {
-      texts: visibleTexts,
-      start: {
-        line: visibleRanges[0].start.line,
-        character: visibleRanges[0].start.character,
-      },
-      end: {
-        line: visibleRanges[0].end.line,
-        character: visibleRanges[0].end.character,
-      },
-    };
-  }
-
-  function createDecoration(char: string, isPriority: boolean = false) {
-    return vscode.window.createTextEditorDecorationType({
-      textDecoration: "none; display: none",
-      after: {
-        contentText: char,
-        color: isPriority ? "#f70078" : "#0db3d0",
-        fontWeight: "bold",
-      },
-    });
-  }
-
   function setWordsColor(
     editor: vscode.TextEditor,
     visibleTexts: VisibleTexts,
@@ -168,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
     const positions: vscode.Position[] = [];
 
     for (let i = 0; i < visibleTexts.texts.length; i++) {
-      const regexWords = visibleTexts.texts[i].matchAll(regex);
+      const regexWords = visibleTexts.texts[i].matchAll(REGEX);
       for (const word of regexWords) {
         if (word[0] === "") {
           continue;
@@ -184,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const closestIndex = findClosestIndex(activePosition, positions);
 
-    const permutation = generateMax2Permutations(chars, positions.length);
+    const permutation = generateMax2Permutations(CHARS, positions.length);
     let hints = permutation.hints;
 
     const targetShiftIndex = Math.max(
