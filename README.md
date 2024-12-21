@@ -18,6 +18,17 @@ Install through VS Code Marketplace (coming soon).
 2. Visual highlights will appear in your text
 3. Type the highlighted character to jump to that location
 
+## TODO
+
+- [ ] Add customizable keybindings
+- [ ] Support for multi-character jump sequences
+- [ ] Add different jump modes (word start, word end, line start)
+- [ ] Implement case-sensitive matching option
+- [ ] Add visual selection mode while jumping
+- [ ] Improve performance for large files
+- [ ] Add configuration for highlight colors
+- [ ] Support for regular expression based jumps
+
 ## Status
 
 This is currently in beta (v0.1.0-beta). Please report any issues you encounter!
