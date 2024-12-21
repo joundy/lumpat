@@ -1,7 +1,68 @@
 import * as vscode from "vscode";
 
-const chars = "qwertyuiopasdfghjklzxcvbnm".split("");
+const chars = "asdfghjklqwertyuiopzxcvbnm".split("");
 
+// regex for match chars positions
+const regex = /(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$/g;
+
+function shiftPermutations(
+  arr: string[],
+  startIndex: number,
+  endIndex: number,
+  targetIndex: number,
+) {
+  console.log({ arr, startIndex, endIndex, targetIndex });
+
+  const toShift = arr.slice(startIndex, endIndex + 1);
+  arr.splice(startIndex, endIndex - startIndex + 1);
+  arr.splice(targetIndex, 0, ...toShift);
+  return arr;
+}
+
+const generateMax2Permutations = (
+  chars: string[],
+  total = 10,
+): {
+  priorityIndex: number;
+
+  hints: string[];
+} => {
+  const results = [];
+
+  if (total < chars.length) {
+    return {
+      priorityIndex: 0,
+      hints: chars.slice(0, total),
+    };
+  }
+
+  for (let i = 0; i < chars.length; i++) {
+    for (let j = 0; j < chars.length; j++) {
+      results.push(chars[i] + chars[j]);
+
+      if (results.length + chars.length - i - 1 === total) {
+        return {
+          priorityIndex: results.length,
+          hints: results.concat(chars.slice(i + 1)),
+        };
+      }
+
+      if (results.length === total) {
+        return {
+          priorityIndex: results.length,
+          hints: results,
+        };
+      }
+    }
+  }
+
+  return {
+    priorityIndex: -1,
+    hints: results,
+  };
+};
+
+// expensive, TODO: optimize this function
 const findClosestIndex = (
   target: vscode.Position,
   positions: vscode.Position[],
@@ -101,60 +162,54 @@ export function activate(context: vscode.ExtensionContext) {
     const positions: vscode.Position[] = [];
 
     for (let i = 0; i < visibleTexts.texts.length; i++) {
-      const words = visibleTexts.texts[i].split(" ");
-
-      let positionIndex = 0;
-      for (let j = 0; j < words.length; j++) {
-        // skip tab character word
-        if (words[j].length === 0) {
-          positionIndex++;
+      const regexWords = visibleTexts.texts[i].matchAll(regex);
+      for (const word of regexWords) {
+        if (word[0] === "") {
           continue;
         }
 
         let position = new vscode.Position(
           i + visibleTexts.start.line,
-          positionIndex,
+          word.index,
         );
         positions.push(position);
-
-        positionIndex += words[j].length;
-        positionIndex++; // compensate for space
       }
     }
 
     const closestIndex = findClosestIndex(activePosition, positions);
 
-    const middleCharIndex = Math.floor(chars.length / 2);
-    const positionProrityStart = Math.max(closestIndex - middleCharIndex, 0);
+    const permutation = generateMax2Permutations(chars, positions.length);
+    let hints = permutation.hints;
+
+    const targetShiftIndex = Math.max(
+      closestIndex - Math.floor((hints.length - permutation.priorityIndex) / 2),
+      0,
+    );
+    if (permutation.priorityIndex > 0) {
+      hints = shiftPermutations(
+        hints,
+        permutation.priorityIndex,
+        hints.length - 1,
+        targetShiftIndex,
+      );
+    }
 
     for (let i = 0; i < positions.length; i++) {
-      if (
-        i >= positionProrityStart &&
-        i < positionProrityStart + chars.length
-      ) {
-        const decoration = createDecoration(
-          chars[i - positionProrityStart],
-          true,
-        );
-        decorations.push(decoration);
-
-        const range = new vscode.Range(
-          positions[i],
-          positions[i].translate(0, chars[i - positionProrityStart].length),
-        );
-        editor.setDecorations(decoration, [range]);
-        charMap[chars[i - positionProrityStart]] = positions[i];
-
-        continue;
+      if (i > hints.length) {
+        break;
       }
 
-      const decoration = createDecoration("ZZ");
+      const char = hints[i];
+      const decoration = createDecoration(char, hints[i].length === 1);
       decorations.push(decoration);
 
       const range = new vscode.Range(
         positions[i],
-        positions[i].translate(0, 2),
+        positions[i].translate(0, char.length),
       );
+
+      charMap[char] = positions[i];
+
       editor.setDecorations(decoration, [range]);
     }
   }
