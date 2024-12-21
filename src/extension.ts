@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-const chars = "asdfghjklqwertyuiopzxcvbnm".split("");
+const chars = "fjkasdlghqwertyuiopzxcvbnm".split("");
 
 // regex for match chars positions
 const regex = /(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$/g;
@@ -11,8 +11,6 @@ function shiftPermutations(
   endIndex: number,
   targetIndex: number,
 ) {
-  console.log({ arr, startIndex, endIndex, targetIndex });
-
   const toShift = arr.slice(startIndex, endIndex + 1);
   arr.splice(startIndex, endIndex - startIndex + 1);
   arr.splice(targetIndex, 0, ...toShift);
@@ -81,6 +79,12 @@ export function activate(context: vscode.ExtensionContext) {
   let charMap: {
     [keyof: string]: vscode.Position;
   } = {};
+  let listenChar = "";
+  let maxCharacter = 0;
+  function pushChar(char: string, position: vscode.Position) {
+    charMap[char] = position;
+    maxCharacter = Math.max(maxCharacter, char.length);
+  }
 
   const backgroundCharDec = vscode.window.createTextEditorDecorationType({
     color: "#515878",
@@ -99,6 +103,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
     decorations = [];
     charMap = {};
+    listenChar = "";
+    maxCharacter = 0;
   }
 
   type VisibleTexts = {
@@ -208,7 +214,7 @@ export function activate(context: vscode.ExtensionContext) {
         positions[i].translate(0, char.length),
       );
 
-      charMap[char] = positions[i];
+      pushChar(char, positions[i]);
 
       editor.setDecorations(decoration, [range]);
     }
@@ -265,18 +271,34 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand("default:type", args);
       return;
     }
+    if (listenChar.length > maxCharacter) {
+      vscode.commands.executeCommand("default:type", args);
+      return;
+    }
+
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
       return;
     }
 
     const text = args.text;
+    listenChar += text;
 
-    if (charMap[text]) {
-      const selection = new vscode.Selection(charMap[text], charMap[text]);
+    if (charMap[listenChar]) {
+      const selection = new vscode.Selection(
+        charMap[listenChar],
+        charMap[listenChar],
+      );
 
       editor.selection = selection;
-      editor.revealRange(new vscode.Range(charMap[text], charMap[text]));
+      editor.revealRange(
+        new vscode.Range(charMap[listenChar], charMap[listenChar]),
+      );
+    } else {
+      if (listenChar.length < maxCharacter) {
+        // listen next character
+        return;
+      }
     }
 
     reset(editor);
