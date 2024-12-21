@@ -22,6 +22,12 @@ Install through VS Code Marketplace (coming soon).
 
 This is currently in beta (v0.1.0-beta). Please report any issues you encounter!
 
+## Acknowledgments
+
+This extension is highly inspired by:
+- [hop.nvim](https://github.com/hadronized/hop.nvim)
+- [jumpy2](https://github.com/DavidLGoldberg/jumpy2)
+
 ## License
 
 MIT
