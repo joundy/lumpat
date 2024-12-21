@@ -4,7 +4,7 @@
   "publisher": "Joundy",
   "repository": "https://github.com/joundy/lumpat",
   "description": "An easy motion extension",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -21,6 +21,11 @@
       }
     ],
     "keybindings": [
+      {
+        "command": "lumpat.jump",
+        "key": "shift+enter",
+        "when": "editorTextFocus"
+      },
       {
         "command": "lumpat.a",
         "key": "a",
