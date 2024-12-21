@@ -28,6 +28,7 @@ Install through VS Code Marketplace (coming soon).
 - [ ] Improve performance for large files
 - [ ] Add configuration for highlight colors
 - [ ] Support for regular expression based jumps
+- [ ] Support jumping across multiple windows
 
 ## Status
 
