@@ -1,11 +1,26 @@
 import * as vscode from "vscode";
 
-function getRandomLowerCaseLetter() {
-  const alphabet = "abcdefghijklmnopqrstuvwxyz";
-  return alphabet[Math.floor(Math.random() * alphabet.length)];
-}
+const chars = "qwertyuiopasdfghjklzxcvbnm".split("");
+
+const findClosestIndex = (
+  target: vscode.Position,
+  positions: vscode.Position[],
+): number =>
+  positions.reduce(
+    (closest, pos, i) => {
+      const diff =
+        Math.abs(target.line - pos.line) * 1000 +
+        Math.abs(target.character - pos.character);
+      return diff < closest.diff ? { diff, index: i } : closest;
+    },
+    { diff: Infinity, index: -1 },
+  ).index;
 
 export function activate(context: vscode.ExtensionContext) {
+  let charMap: {
+    [keyof: string]: vscode.Position;
+  } = {};
+
   const backgroundCharDec = vscode.window.createTextEditorDecorationType({
     color: "#515878",
   });
@@ -14,87 +29,152 @@ export function activate(context: vscode.ExtensionContext) {
 
   let decorations: vscode.TextEditorDecorationType[] = [];
 
-  function updateDecorations(editor: vscode.TextEditor) {
-    const text = editor.document.getText();
-    if (text.length === 0) {
-      return;
+  function reset(editor: vscode.TextEditor) {
+    isEnabled = false;
+    editor.setDecorations(backgroundCharDec, []);
+
+    for (let i = 0; i < decorations.length; i++) {
+      editor.setDecorations(decorations[i], []);
+    }
+    decorations = [];
+    charMap = {};
+  }
+
+  type VisibleTexts = {
+    texts: string[];
+    start: {
+      line: number;
+      character: number;
+    };
+    end: {
+      line: number;
+      character: number;
+    };
+  };
+
+  function getVisibleTexts(editor: vscode.TextEditor): VisibleTexts | null {
+    const visibleRanges = editor.visibleRanges;
+    let visibleTexts: string[] = [];
+
+    if (visibleRanges.length === 0) {
+      return null;
     }
 
-    function setBackgroundColor() {
-      const firstRange = new vscode.Position(0, 0);
-
-      const lastLineIndex = editor.document.lineCount - 1;
-      const lastLine = editor.document.lineAt(lastLineIndex);
-      const lastCharacterIndex = lastLine.text.length;
-      const lastRange = new vscode.Position(lastLineIndex, lastCharacterIndex);
-      const range = new vscode.Range(firstRange, lastRange);
-
-      editor.setDecorations(backgroundCharDec, [range]);
+    for (
+      let i = visibleRanges[0].start.line;
+      i <= visibleRanges[0].end.line;
+      i++
+    ) {
+      const text = editor.document.lineAt(i).text;
+      visibleTexts.push(text);
     }
 
-    function setWordsColor() {
-      const textLines = text.split("\n");
+    return {
+      texts: visibleTexts,
+      start: {
+        line: visibleRanges[0].start.line,
+        character: visibleRanges[0].start.character,
+      },
+      end: {
+        line: visibleRanges[0].end.line,
+        character: visibleRanges[0].end.character,
+      },
+    };
+  }
 
-      // let ranges: vscode.Range[] = [];
-      for (let i = 0; i < textLines.length; i++) {
-        const words = textLines[i].split(" ");
+  function createDecoration(char: string) {
+    return vscode.window.createTextEditorDecorationType({
+      textDecoration: "none; display: none",
+      after: {
+        contentText: char,
+        color: "#f70078",
+        fontWeight: "bold",
+      },
+    });
+  }
 
-        // console.log({ words });
+  function setWordsColor(
+    editor: vscode.TextEditor,
+    visibleTexts: VisibleTexts,
+    activePosition: vscode.Position,
+  ) {
+    const positions: vscode.Position[] = [];
 
-        let positionIndex = 0;
-        for (let j = 0; j < words.length; j++) {
-          // skip tab character word
-          if (words[j].length === 0) {
-            positionIndex++;
-            continue;
-          }
+    for (let i = 0; i < visibleTexts.texts.length; i++) {
+      const words = visibleTexts.texts[i].split(" ");
 
-          let position = new vscode.Position(i, positionIndex);
-          const range = new vscode.Range(position, position.translate(0, 1));
-
-          let decor = vscode.window.createTextEditorDecorationType({
-            textDecoration: "none; display: none",
-            after: {
-              contentText: getRandomLowerCaseLetter(),
-              color: "#f70078",
-              fontWeight: "bold",
-            },
-          });
-
-          decorations.push(decor);
-          editor.setDecorations(decor, [range]);
-
-          // ranges.push(range);
-
-          positionIndex += words[j].length;
-          positionIndex++; // compensate for space
-
-          // console.log({ word: words[j], range, positionIndex });
+      let positionIndex = 0;
+      for (let j = 0; j < words.length; j++) {
+        // skip tab character word
+        if (words[j].length === 0) {
+          positionIndex++;
+          continue;
         }
+
+        let position = new vscode.Position(
+          i + visibleTexts.start.line,
+          positionIndex,
+        );
+        positions.push(position);
+
+        positionIndex += words[j].length;
+        positionIndex++; // compensate for space
       }
-
-      // console.log({ ranges });
-
-      // editor.setDecorations(wordCharDec, [
-      //   new vscode.Range(new vscode.Position(13, 7), new vscode.Position(13, 8)),
-      // ]);
     }
 
+    const closestIndex = findClosestIndex(activePosition, positions);
+
+    const middleCharIndex = Math.floor(chars.length / 2);
+    const positionProrityStart = Math.max(closestIndex - middleCharIndex, 0);
+
+    for (let i = positionProrityStart; i < positions.length; i++) {
+      if (i - positionProrityStart >= chars.length) {
+        break;
+      }
+
+      const decoration = createDecoration(chars[i - positionProrityStart]);
+      decorations.push(decoration);
+
+      const range = new vscode.Range(
+        positions[i],
+        positions[i].translate(0, chars[i - positionProrityStart].length),
+      );
+      editor.setDecorations(decoration, [range]);
+      charMap[chars[i - positionProrityStart]] = positions[i];
+    }
+  }
+
+  function setBackgroundColor(
+    editor: vscode.TextEditor,
+    visibleTexts: VisibleTexts,
+  ) {
+    const firstRange = new vscode.Position(visibleTexts.start.line, 0);
+    const lastRange = new vscode.Position(
+      visibleTexts.end.line,
+      visibleTexts.end.character,
+    );
+
+    const range = new vscode.Range(firstRange, lastRange);
+
+    editor.setDecorations(backgroundCharDec, [range]);
+  }
+
+  function jump(editor: vscode.TextEditor) {
     if (isEnabled) {
-      isEnabled = false;
-      editor.setDecorations(backgroundCharDec, []);
-
-      for (let i = 0; i < decorations.length; i++) {
-        editor.setDecorations(decorations[i], []);
-      }
-      decorations = [];
-
+      reset(editor);
       return;
-    } else {
-      setBackgroundColor();
-      setWordsColor();
-      isEnabled = true;
     }
+
+    const visibleTexts = getVisibleTexts(editor);
+    if (!visibleTexts) {
+      return;
+    }
+
+    const activePosition = editor.selection.active;
+
+    setBackgroundColor(editor, visibleTexts);
+    setWordsColor(editor, visibleTexts, activePosition);
+    isEnabled = true;
   }
 
   const disposable = vscode.commands.registerCommand(
@@ -104,16 +184,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (!editor) {
         return;
       }
-      updateDecorations(editor);
-
-      // const result = await vscode.window.showInputBox({
-      //   prompt: "Press any key",
-      //   password: true,
-      //   ignoreFocusOut: true,
-      //   placeHolder: "Press any key",
-      // });
-      //
-      // console.log({ result });
+      jump(editor);
     },
   );
 
@@ -124,9 +195,21 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand("default:type", args);
       return;
     }
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return;
+    }
+
     const text = args.text;
 
-    console.log({ text });
+    if (charMap[text]) {
+      const selection = new vscode.Selection(charMap[text], charMap[text]);
+
+      editor.selection = selection;
+      editor.revealRange(new vscode.Range(charMap[text], charMap[text]));
+    }
+
+    reset(editor);
   });
 
   context.subscriptions.push(typeDisposable);
