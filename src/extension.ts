@@ -188,7 +188,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     ...CHARS.map((char) => {
-      console.log(`lumpat.${char}`);
       return vscode.commands.registerCommand(`lumpat.${char}`, () =>
         listenChar(char),
       );
