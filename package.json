@@ -7,7 +7,7 @@
     "url": "https://github.com/joundy/lumpat"
   },
   "description": "A VS Code extension that enhances text navigation with quick jump-to-highlight functionality (vim easy motion like).",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -37,6 +37,10 @@
       {
         "command": "lumpat.jump",
         "title": "Highlight Jump Texts"
+      },
+      {
+        "command": "lumpat.close",
+        "title": "Close Jump Mode"
       }
     ],
     "keybindings": [
@@ -44,6 +48,11 @@
         "command": "lumpat.jump",
         "key": "shift+enter",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "lumpat.close",
+        "key": "escape",
+        "when": "lumpat.jump-mode && editorTextFocus"
       },
       {
         "command": "lumpat.a",

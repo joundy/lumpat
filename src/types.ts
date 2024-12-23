@@ -10,3 +10,8 @@ export type VisibleTexts = {
   };
 };
 
+export enum StatusBar {
+  JUMP = "🤸",
+  IDLE = "😴",
+  HINT_NOT_FOUND = "💢",
+}

@@ -7,7 +7,7 @@ import {
   shiftPermutations,
 } from "./utils";
 import { BACKGROUND_COLOR, CHARS, REGEX } from "./consts";
-import { VisibleTexts } from "./types";
+import { StatusBar, VisibleTexts } from "./types";
 
 const backgroundCharDec = vscode.window.createTextEditorDecorationType({
   color: BACKGROUND_COLOR,
@@ -25,13 +25,30 @@ function pushChar(char: string, position: vscode.Position) {
 
 let decorations: vscode.TextEditorDecorationType[] = [];
 
+function setStatusBar(status: StatusBar | string) {
+  statusBar.text = `Lumpat: ${status}`;
+  statusBar.show();
+}
+
 let isEnabled = false;
 function setEnabled(enabled: boolean) {
+  if (!enabled) {
+    setStatusBar(StatusBar.IDLE);
+  } else {
+    setStatusBar(StatusBar.JUMP);
+  }
+
   isEnabled = enabled;
   vscode.commands.executeCommand("setContext", "lumpat.jump-mode", enabled);
 }
 
+let statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
+  vscode.StatusBarAlignment.Left,
+  100,
+);
+
 function reset(editor?: vscode.TextEditor, deactivate = false) {
+  setStatusBar(StatusBar.IDLE);
   setEnabled(false);
 
   if (editor) {
@@ -43,6 +60,7 @@ function reset(editor?: vscode.TextEditor, deactivate = false) {
 
   if (deactivate) {
     backgroundCharDec.dispose();
+    statusBar.dispose();
   }
 
   for (let i = 0; i < decorations.length; i++) {
@@ -56,6 +74,10 @@ function reset(editor?: vscode.TextEditor, deactivate = false) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  console.info("Extension 'lumpat' is now active!");
+
+  setStatusBar(StatusBar.IDLE);
+
   function setTextsColor(
     editor: vscode.TextEditor,
     visibleTexts: VisibleTexts,
@@ -150,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
     setEnabled(true);
   }
 
-  const disposable = vscode.commands.registerCommand(
+  const disposableJump = vscode.commands.registerCommand(
     "lumpat.jump",
     async () => {
       const editor = vscode.window.activeTextEditor;
@@ -160,8 +182,30 @@ export function activate(context: vscode.ExtensionContext) {
       jump(editor);
     },
   );
+  context.subscriptions.push(disposableJump);
 
-  context.subscriptions.push(disposable);
+  function close(editor: vscode.TextEditor) {
+    reset(editor);
+  }
+
+  const disposableClose = vscode.commands.registerCommand(
+    "lumpat.close",
+    async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        return;
+      }
+      close(editor);
+    },
+  );
+  context.subscriptions.push(disposableClose);
+
+  const disposableOnScroll = vscode.window.onDidChangeTextEditorVisibleRanges(
+    async (event) => {
+      close(event.textEditor);
+    },
+  );
+  context.subscriptions.push(disposableOnScroll);
 
   function listenChar(key: string) {
     if (listenedChar.length > maxCharacter) {
@@ -175,6 +219,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     listenedChar += key;
+
+    setStatusBar(listenedChar);
 
     if (charMap[listenedChar]) {
       const selection = new vscode.Selection(

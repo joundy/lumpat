@@ -2,6 +2,11 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.6-beta] - 2024-12-21
+### Added
+- ESC / jump.close to close jump mode
+- Status bar lumpat
+
 ## [0.1.5-beta] - 2024-12-21
 ### Bug Fixes
 - Dispose background decoration when deactivated only
