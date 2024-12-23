@@ -22,6 +22,14 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 2. Visual highlights will appear in your text
 3. Type the highlighted character to jump to that location
 
+## Default Keyboard Shortcuts
+
+| Shortcut | Command | Description |
+|----------|---------|-------------|
+| `Shift + Enter` | `lumpat.jump` | Activate jump mode and highlight jump targets |
+| `Escape` | `lumpat.close` | Exit jump mode |
+| `a-z` | `lumpat.[key]` | Jump to the highlighted location marked with that letter when jump-mode is active |
+
 ## TODO
 
 - [ ] Configurable settings
