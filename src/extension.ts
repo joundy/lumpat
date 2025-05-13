@@ -24,6 +24,8 @@ function pushChar(char: string, position: vscode.Position) {
 
 let decorations: vscode.TextEditorDecorationType[] = [];
 
+let hints: string[] = [];
+
 function setStatusBar(status: StatusBar | string) {
   statusBar.text = `Lumpat: ${status}`;
   statusBar.show();
@@ -70,6 +72,7 @@ function reset(editor?: vscode.TextEditor, deactivate = false) {
   charMap = {};
   listenedChar = "";
   maxCharacter = 0;
+  hints = [];
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -100,7 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const closestIndex = findClosestIndex(activePosition, positions);
-    const hints = generatePermutations(getChars(), positions.length, closestIndex);
+    hints = generatePermutations(getChars(), positions.length, closestIndex);
 
     for (let i = 0; i < positions.length; i++) {
       if (i > hints.length) {
@@ -138,7 +141,6 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function jump(editor: vscode.TextEditor) {
-    console.log("JUMP TRIGGERED UPDATE");
     if (isEnabled) {
       reset(editor);
       return;
@@ -219,7 +221,36 @@ export function activate(context: vscode.ExtensionContext) {
       );
     } else {
       if (listenedChar.length < maxCharacter) {
-        // listen next character
+        for (let i = 0; i < decorations.length; i++) {
+          decorations[i].dispose();
+        }
+        decorations = [];
+
+        for (const hint of hints) {
+          if (hint.startsWith(listenedChar)) {
+            const charReminder = hint.slice(listenedChar.length);
+
+            const decoration = createDecoration(
+              charReminder,
+              charReminder.length === 1
+            );
+            decorations.push(decoration);
+
+            const charPosition = charMap[hint];
+            const newPosition = new vscode.Position(
+              charPosition.line,
+              charPosition.character + listenChar.length
+            );
+
+            const range = new vscode.Range(
+              newPosition,
+              newPosition.translate(0, charReminder.length)
+            );
+
+            editor.setDecorations(decoration, [range]);
+          }
+        }
+
         return;
       }
     }
