@@ -2,6 +2,11 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.8] - 2025-05-14
+### Enhanced
+- **Improved text highlighting** for better visibility during jumps
+- **Enhanced visual feedback** when selecting jump targets
+
 ## [0.1.7] - 2025-05-13
 ### Added
 - Configurable settings through VSCode configuration
