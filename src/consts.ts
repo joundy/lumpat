@@ -1,4 +1,4 @@
-export const CHARS = "fjkasdlghqwertyuiopzxcvbnm".split("");
+export const CHARS = "asdghklqwertyuiopzxcvbnmfj".split("");
 
 // regex for match chars positions
 export const REGEX = /(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$/g;

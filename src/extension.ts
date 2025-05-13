@@ -2,9 +2,8 @@ import * as vscode from "vscode";
 import {
   createDecoration,
   findClosestIndex,
-  generateMax2Permutations,
+  generatePermutations,
   getVisibleTexts,
-  shiftPermutations,
 } from "./utils";
 import { BACKGROUND_COLOR, CHARS, REGEX } from "./consts";
 import { StatusBar, VisibleTexts } from "./types";
@@ -44,7 +43,7 @@ function setEnabled(enabled: boolean) {
 
 let statusBar: vscode.StatusBarItem = vscode.window.createStatusBarItem(
   vscode.StatusBarAlignment.Left,
-  100,
+  100
 );
 
 function reset(editor?: vscode.TextEditor, deactivate = false) {
@@ -81,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
   function setTextsColor(
     editor: vscode.TextEditor,
     visibleTexts: VisibleTexts,
-    activePosition: vscode.Position,
+    activePosition: vscode.Position
   ) {
     const positions: vscode.Position[] = [];
 
@@ -94,29 +93,14 @@ export function activate(context: vscode.ExtensionContext) {
 
         let position = new vscode.Position(
           i + visibleTexts.start.line,
-          text.index,
+          text.index
         );
         positions.push(position);
       }
     }
 
     const closestIndex = findClosestIndex(activePosition, positions);
-
-    const permutation = generateMax2Permutations(CHARS, positions.length);
-    let hints = permutation.hints;
-
-    const targetShiftIndex = Math.max(
-      closestIndex - Math.floor((hints.length - permutation.priorityIndex) / 2),
-      0,
-    );
-    if (permutation.priorityIndex > 0) {
-      hints = shiftPermutations(
-        hints,
-        permutation.priorityIndex,
-        hints.length - 1,
-        targetShiftIndex,
-      );
-    }
+    const hints = generatePermutations(CHARS, positions.length, closestIndex);
 
     for (let i = 0; i < positions.length; i++) {
       if (i > hints.length) {
@@ -129,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const range = new vscode.Range(
         positions[i],
-        positions[i].translate(0, char.length),
+        positions[i].translate(0, char.length)
       );
 
       pushChar(char, positions[i]);
@@ -140,12 +124,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   function setBackgroundColor(
     editor: vscode.TextEditor,
-    visibleTexts: VisibleTexts,
+    visibleTexts: VisibleTexts
   ) {
     const firstRange = new vscode.Position(visibleTexts.start.line, 0);
     const lastRange = new vscode.Position(
       visibleTexts.end.line,
-      visibleTexts.end.character,
+      visibleTexts.end.character
     );
 
     const range = new vscode.Range(firstRange, lastRange);
@@ -154,6 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function jump(editor: vscode.TextEditor) {
+    console.log("JUMP TRIGGERED UPDATE");
     if (isEnabled) {
       reset(editor);
       return;
@@ -180,7 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
       jump(editor);
-    },
+    }
   );
   context.subscriptions.push(disposableJump);
 
@@ -196,14 +181,14 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
       close(editor);
-    },
+    }
   );
   context.subscriptions.push(disposableClose);
 
   const disposableOnScroll = vscode.window.onDidChangeTextEditorVisibleRanges(
     async (event) => {
       close(event.textEditor);
-    },
+    }
   );
   context.subscriptions.push(disposableOnScroll);
 
@@ -225,12 +210,12 @@ export function activate(context: vscode.ExtensionContext) {
     if (charMap[listenedChar]) {
       const selection = new vscode.Selection(
         charMap[listenedChar],
-        charMap[listenedChar],
+        charMap[listenedChar]
       );
 
       editor.selection = selection;
       editor.revealRange(
-        new vscode.Range(charMap[listenedChar], charMap[listenedChar]),
+        new vscode.Range(charMap[listenedChar], charMap[listenedChar])
       );
     } else {
       if (listenedChar.length < maxCharacter) {
@@ -245,9 +230,9 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     ...CHARS.map((char) => {
       return vscode.commands.registerCommand(`lumpat.${char}`, () =>
-        listenChar(char),
+        listenChar(char)
       );
-    }),
+    })
   );
 }
 

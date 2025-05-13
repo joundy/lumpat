@@ -1,66 +1,47 @@
 import * as vscode from "vscode";
 import { VisibleTexts } from "./types";
 import { HIGHTLIGHT_COLOR, HIGHTLIGHT_COLOR_PRIORITY } from "./consts";
+import { triePermutations } from "./trie-permutation";
 
-export function shiftPermutations(
-  arr: string[],
-  startIndex: number,
-  endIndex: number,
-  targetIndex: number,
-) {
-  const toShift = arr.slice(startIndex, endIndex + 1);
-  arr.splice(startIndex, endIndex - startIndex + 1);
-  arr.splice(targetIndex, 0, ...toShift);
-  return arr;
-}
-
-export const generateMax2Permutations = (
-  chars: string[],
-  total = 10,
-): {
-  priorityIndex: number;
-
-  hints: string[];
-} => {
-  const results = [];
-
-  if (total < chars.length) {
-    return {
-      priorityIndex: 0,
-      hints: chars.slice(0, total),
-    };
+export function generatePermutations(
+  keys: string[],
+  n: number,
+  fromPosition: number
+): string[] {
+  if (fromPosition < 0 || fromPosition >= n) {
+    throw new Error("Invalid fromPosition");
   }
-
-  for (let i = 0; i < chars.length; i++) {
-    for (let j = 0; j < chars.length; j++) {
-      results.push(chars[i] + chars[j]);
-
-      if (results.length + chars.length - i - 1 === total) {
-        return {
-          priorityIndex: results.length,
-          hints: results.concat(chars.slice(i + 1)),
-        };
+  const results: string[] = new Array(n).fill("");
+  const chars: string[] = triePermutations(keys, n);
+  results[fromPosition] = chars[0];
+  let leftIndex = fromPosition - 1;
+  let rightIndex = fromPosition + 1;
+  for (let i = 1; i < chars.length; i++) {
+    if (i % 2 === 1) {
+      if (leftIndex >= 0) {
+        results[leftIndex] = chars[i];
+        leftIndex--;
+      } else if (rightIndex < n) {
+        results[rightIndex] = chars[i];
+        rightIndex++;
       }
-
-      if (results.length === total) {
-        return {
-          priorityIndex: results.length,
-          hints: results,
-        };
+    } else {
+      if (rightIndex < n) {
+        results[rightIndex] = chars[i];
+        rightIndex++;
+      } else if (leftIndex >= 0) {
+        results[leftIndex] = chars[i];
+        leftIndex--;
       }
     }
   }
-
-  return {
-    priorityIndex: -1,
-    hints: results,
-  };
-};
+  return results;
+}
 
 // expensive, TODO: optimize this function
 export const findClosestIndex = (
   target: vscode.Position,
-  positions: vscode.Position[],
+  positions: vscode.Position[]
 ): number =>
   positions.reduce(
     (closest, pos, i) => {
@@ -69,11 +50,11 @@ export const findClosestIndex = (
         Math.abs(target.character - pos.character);
       return diff < closest.diff ? { diff, index: i } : closest;
     },
-    { diff: Infinity, index: -1 },
+    { diff: Infinity, index: -1 }
   ).index;
 
 export function getVisibleTexts(
-  editor: vscode.TextEditor,
+  editor: vscode.TextEditor
 ): VisibleTexts | null {
   const visibleRanges = editor.visibleRanges;
   let visibleTexts: string[] = [];
