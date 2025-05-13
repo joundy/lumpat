@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { VisibleTexts } from "./types";
-import { HIGHTLIGHT_COLOR, HIGHTLIGHT_COLOR_PRIORITY } from "./consts";
+import { HIGHTLIGHT_COLOR, HIGHTLIGHT_COLOR_PRIORITY } from "./config";
 import { triePermutations } from "./trie-permutation";
 
 export function generatePermutations(

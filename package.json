@@ -1,5 +1,5 @@
 {
-  "name": "Lumpat",
+  "name": "lumpat",
   "displayName": "lumpat",
   "publisher": "Joundy",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/joundy/lumpat"
   },
   "description": "A VS Code extension that enhances text navigation with quick jump-to-highlight functionality (vim easy motion like).",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -33,6 +33,36 @@
   "main": "./dist/extension.js",
   "icon": "assets/lumpat_logo.png",
   "contributes": {
+    "configuration": {
+      "title": "Lumpat",
+      "properties": {
+        "lumpat.chars": {
+          "type": "string",
+          "default": "asdghklqwertyuiopzxcvbnmfj",
+          "description": "Characters used for jump labels"
+        },
+        "lumpat.backgroundColor": {
+          "type": "string",
+          "default": "#515878",
+          "description": "Background color for jump mode"
+        },
+        "lumpat.highlightColor": {
+          "type": "string",
+          "default": "#0db3d0",
+          "description": "Highlight color for jump labels"
+        },
+        "lumpat.highlightColorPriority": {
+          "type": "string",
+          "default": "#f70078",
+          "description": "Priority highlight color for jump labels"
+        },
+        "lumpat.regexPattern": {
+          "type": "string",
+          "default": "(\\b\\w)|(\\B(?=[A-Z]|[#_]\\w))|\\b$",
+          "description": "Regular expression pattern used for matching jump positions"
+        }
+      }
+    },
     "commands": [
       {
         "command": "lumpat.jump",

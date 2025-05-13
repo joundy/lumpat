@@ -30,13 +30,19 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 | `Escape` | `lumpat.close` | Exit jump mode |
 | `a-z` | `lumpat.[key]` | Jump to the highlighted location marked with that letter when jump-mode is active |
 
-## TODO
+## Configuration
 
-- [ ] Configurable settings
-- [ ] Support jumping across multiple windows
-- [ ] Add different jump modes (word start, word end, line start)
-- [ ] Improve performance for large files
-- [ ] Implement case-sensitive matching option
+Lumpat provides several customization options through VSCode settings:
+
+| Setting | Description | Default |
+|---------|-------------|--------|
+| `lumpat.chars` | Characters used for jump labels | `"asdghklqwertyuiopzxcvbnmfj"` |
+| `lumpat.backgroundColor` | Background color for jump mode | `"#515878"` |
+| `lumpat.highlightColor` | Highlight color for jump labels | `"#0db3d0"` |
+| `lumpat.highlightColorPriority` | Priority highlight color for jump labels | `"#f70078"` |
+| `lumpat.regexPattern` | Regular expression pattern for matching jump positions | `"(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$"` |
+
+You can customize these settings in your VSCode settings.json file or through the Settings UI.
 
 ## Status
 

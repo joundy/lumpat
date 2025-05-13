@@ -5,11 +5,11 @@ import {
   generatePermutations,
   getVisibleTexts,
 } from "./utils";
-import { BACKGROUND_COLOR, CHARS, REGEX } from "./consts";
+import { getBackgroundColor, getChars, getRegex } from "./config";
 import { StatusBar, VisibleTexts } from "./types";
 
 const backgroundCharDec = vscode.window.createTextEditorDecorationType({
-  color: BACKGROUND_COLOR,
+  color: getBackgroundColor(),
 });
 
 let charMap: {
@@ -85,7 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
     const positions: vscode.Position[] = [];
 
     for (let i = 0; i < visibleTexts.texts.length; i++) {
-      const regexTexts = visibleTexts.texts[i].matchAll(REGEX);
+      const regexTexts = visibleTexts.texts[i].matchAll(getRegex());
       for (const text of regexTexts) {
         if (text[0] === "") {
           continue;
@@ -100,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const closestIndex = findClosestIndex(activePosition, positions);
-    const hints = generatePermutations(CHARS, positions.length, closestIndex);
+    const hints = generatePermutations(getChars(), positions.length, closestIndex);
 
     for (let i = 0; i < positions.length; i++) {
       if (i > hints.length) {
@@ -228,7 +228,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   context.subscriptions.push(
-    ...CHARS.map((char) => {
+    ...getChars().map((char: string) => {
       return vscode.commands.registerCommand(`lumpat.${char}`, () =>
         listenChar(char)
       );

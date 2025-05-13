@@ -2,6 +2,11 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.7] - 2025-05-13
+### Added
+- Configurable settings through VSCode configuration
+- Improved performance and experience with trie-based permutation algorithm
+
 ## [0.1.6-beta] - 2024-12-21
 ### Added
 - ESC / jump.close to close jump mode
