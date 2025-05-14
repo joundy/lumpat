@@ -5,11 +5,11 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 ### Single column jump (lumpat.jump or shift + enter)
 
-![Image](https://github.com/user-attachments/assets/9f1ce19d-6347-4a9d-8d27-a75c09533a1b)
+![Image](https://raw.githubusercontent.com/joundy/lumpat/refs/heads/master/assets/lumpat_single_column.gif)
 
 ### Multiple column jump (lumpat.jumpMulti or ctrl + shift + enter)
 
-![Image](https://github.com/user-attachments/assets/9f1ce19d-6347-4a9d-8d27-a75c09533a1b)
+![Image](https://raw.githubusercontent.com/joundy/lumpat/refs/heads/master/assets/lumpat_multi_columns.gif)
 
 ## Features
 
@@ -24,7 +24,7 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 ## Usage
 
-1. Trigger the jump mode using `Shift + Enter` (or run command `lumpat.jump`)
+1. Trigger the jump mode using `Shift + Enter` (or run command `lumpat.jump`) for single column or `Ctrl + Shift + Enter` (or run command `lumpat.jumpMulti`) for multiple columns
 2. Visual highlights will appear in your text
 3. Type the highlighted character to jump to that location
 
@@ -33,7 +33,7 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 | Shortcut               | Command            | Description                                                                       |
 | ---------------------- | ------------------ | --------------------------------------------------------------------------------- |
 | `Shift + Enter`        | `lumpat.jump`      | Activate jump mode and highlight jump targets                                     |
-| `Ctrl + Shift + Enter` | `lumpat.jumpMulti` | Activate multiple column jump mode and highlight jump targets                     |
+| `Ctrl + Shift + Enter` | `lumpat.jumpMulti` | Activate multiple columns jump mode and highlight jump targets                     |
 | `Escape`               | `lumpat.close`     | Exit jump mode                                                                    |
 | `a-z`                  | `lumpat.[key]`     | Jump to the highlighted location marked with that letter when jump-mode is active |
 
