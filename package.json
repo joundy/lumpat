@@ -69,6 +69,10 @@
         "title": "Highlight Jump Texts"
       },
       {
+        "command": "lumpat.jumpMulti",
+        "title": "Highlight Multiple Columns Jump Texts"
+      },
+      {
         "command": "lumpat.close",
         "title": "Close Jump Mode"
       }
@@ -77,6 +81,11 @@
       {
         "command": "lumpat.jump",
         "key": "shift+enter",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "lumpat.jumpMulti",
+        "key": "ctrl+shift+enter",
         "when": "editorTextFocus"
       },
       {

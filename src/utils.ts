@@ -47,7 +47,7 @@ export const findClosestIndex = (
   positions: vscode.Position[]
 ): number => {
   if (positions.length === 0) {
-    return -1;
+    return 0;
   }
   if (positions.length === 1) {
     return 0;
