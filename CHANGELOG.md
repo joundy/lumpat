@@ -2,6 +2,16 @@
 
 All notable changes to the "lumpat" extension will be documented in this file.
 
+## [0.1.9] - 2025-05-15
+### Added
+- **Multiple column jump** feature for enhanced navigation across columns
+
+### Fixed
+- Fixed next character highlighting for improved visibility
+
+### Enhanced
+- Optimized performance for smoother operation
+
 ## [0.1.8] - 2025-05-14
 ### Enhanced
 - **Improved text highlighting** for better visibility during jumps
