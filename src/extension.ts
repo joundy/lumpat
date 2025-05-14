@@ -27,6 +27,59 @@ let listenedChar = "";
 
 let maxCharacter = 0;
 
+// Decoration pool to reuse decorations instead of creating new ones each time
+class DecorationPool {
+  private pool: Map<string, vscode.TextEditorDecorationType> = new Map();
+  private active: Map<string, vscode.TextEditorDecorationType> = new Map();
+  
+  // Get a decoration from the pool or create a new one
+  get(char: string, isPriority: boolean): vscode.TextEditorDecorationType {
+    const key = `${char}-${isPriority ? 'priority' : 'normal'}`;
+    
+    // Check if we already have this decoration active
+    if (this.active.has(key)) {
+      return this.active.get(key)!;
+    }
+    
+    // Check if we have this decoration in the pool
+    let decoration: vscode.TextEditorDecorationType;
+    if (this.pool.has(key)) {
+      decoration = this.pool.get(key)!;
+      this.pool.delete(key);
+    } else {
+      // Create a new decoration if not in pool
+      decoration = createDecoration(char, isPriority);
+    }
+    
+    // Mark as active
+    this.active.set(key, decoration);
+    return decoration;
+  }
+  
+  // Return all active decorations to the pool
+  recycleAll(): void {
+    // Move all active decorations back to the pool
+    this.active.forEach((decoration, key) => {
+      this.pool.set(key, decoration);
+    });
+    this.active.clear();
+  }
+  
+  // Get all active decorations
+  getActiveDecorations(): vscode.TextEditorDecorationType[] {
+    return Array.from(this.active.values());
+  }
+  
+  // Dispose all decorations (both active and pooled)
+  disposeAll(): void {
+    this.active.forEach(decoration => decoration.dispose());
+    this.pool.forEach(decoration => decoration.dispose());
+    this.active.clear();
+    this.pool.clear();
+  }
+}
+
+const decorationPool = new DecorationPool();
 let decorations: vscode.TextEditorDecorationType[] = [];
 
 let hints: string[] = [];
@@ -57,9 +110,8 @@ function setActive(isActive: boolean) {
 }
 
 function disposeDecorations() {
-  for (let i = 0; i < decorations.length; i++) {
-    decorations[i].dispose();
-  }
+  // Recycle decorations instead of disposing them
+  decorationPool.recycleAll();
   decorations = [];
 }
 
@@ -77,9 +129,12 @@ function reset(editor?: vscode.TextEditor, deactivate = false) {
   if (deactivate) {
     backgroundCharDec.dispose();
     statusBar.dispose();
+    // Fully dispose all decorations when deactivating
+    decorationPool.disposeAll();
+  } else {
+    // Just recycle decorations during normal operation
+    disposeDecorations();
   }
-
-  disposeDecorations();
 
   charMap = {};
   listenedChar = "";
@@ -122,13 +177,15 @@ function setHighlight(
   hints: string[],
   positions: vscode.Position[]
 ) {
-  for (let i = 0; i < positions.length; i++) {
-    if (i > hints.length) {
-      break;
-    }
-
+  // Limit the number of decorations to improve performance
+  const maxDecorations = Math.min(positions.length, hints.length, 300);
+  
+  for (let i = 0; i < maxDecorations; i++) {
     const char = hints[i];
-    const decoration = createDecoration(char, hints[i].length === 1);
+    const isPriority = char.length === 1;
+    
+    // Get decoration from pool instead of creating a new one
+    const decoration = decorationPool.get(char, isPriority);
     decorations.push(decoration);
 
     const range = new vscode.Range(
@@ -145,29 +202,29 @@ function setHighlight(
 function setNextHighlight(editor: vscode.TextEditor) {
   disposeDecorations();
 
-  for (const hint of hints) {
-    if (hint.startsWith(listenedChar)) {
-      const charReminder = hint.slice(listenedChar.length);
+  // Filter hints that match the current listened char for better performance
+  const matchingHints = hints.filter(hint => hint.startsWith(listenedChar));
+  
+  for (const hint of matchingHints) {
+    const charReminder = hint.slice(listenedChar.length);
+    const isPriority = charReminder.length === 1;
+    
+    // Get decoration from pool instead of creating a new one
+    const decoration = decorationPool.get(charReminder, isPriority);
+    decorations.push(decoration);
 
-      const decoration = createDecoration(
-        charReminder,
-        charReminder.length === 1
-      );
-      decorations.push(decoration);
+    const charPosition = charMap[hint];
+    const newPosition = new vscode.Position(
+      charPosition.line,
+      charPosition.character + listenedChar.length // Fix: use listenedChar instead of listenChar
+    );
 
-      const charPosition = charMap[hint];
-      const newPosition = new vscode.Position(
-        charPosition.line,
-        charPosition.character + listenChar.length
-      );
+    const range = new vscode.Range(
+      newPosition,
+      newPosition.translate(0, charReminder.length)
+    );
 
-      const range = new vscode.Range(
-        newPosition,
-        newPosition.translate(0, charReminder.length)
-      );
-
-      editor.setDecorations(decoration, [range]);
-    }
+    editor.setDecorations(decoration, [range]);
   }
 }
 
@@ -283,9 +340,33 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(disposableClose);
 
+  // Debounce implementation to prevent excessive calls
+  function debounce<T extends (...args: any[]) => any>(
+    fn: T,
+    delay: number
+  ): (...args: Parameters<T>) => void {
+    let timer: NodeJS.Timeout | null = null;
+    return (...args: Parameters<T>) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        fn(...args);
+        timer = null;
+      }, delay);
+    };
+  }
+  
+  // Debounced close function to reduce performance impact during scrolling
+  const debouncedClose = debounce((textEditor: vscode.TextEditor) => {
+    if (isActive) {
+      close(textEditor);
+    }
+  }, 150); // 150ms debounce time
+  
   const disposableOnScroll = vscode.window.onDidChangeTextEditorVisibleRanges(
-    async (event) => {
-      close(event.textEditor);
+    (event) => {
+      debouncedClose(event.textEditor);
     }
   );
   context.subscriptions.push(disposableOnScroll);

@@ -215,8 +215,24 @@ function permsToStrings(perms: string[][]): string[] {
  * @returns {string[]} String permutations
  */
 
-export  function triePermutations(keys: string[], n: number): string[] {
+// Cache for memoization to avoid recalculating the same permutations
+const permutationCache: Record<string, string[]> = {};
+
+export function triePermutations(keys: string[], n: number): string[] {
+  // Create a cache key based on the input parameters
+  const cacheKey = `${keys.join('')}-${n}`;
+  
+  // Return cached result if available
+  if (permutationCache[cacheKey]) {
+    return permutationCache[cacheKey];
+  }
+  
   const permMethod = new TrieBacktrackFilling();
   const permutations = permMethod.permutations(keys, n);
-  return permsToStrings(permutations);
+  const result = permsToStrings(permutations);
+  
+  // Cache the result for future use
+  permutationCache[cacheKey] = result;
+  
+  return result;
 }
