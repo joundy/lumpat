@@ -45,15 +45,16 @@ function setStatusBar(status: StatusBar | string) {
   statusBar.show();
 }
 
-function setActive(isActive: boolean) {
-  if (!isActive) {
+function setActive(value: boolean) {
+  if (!value) {
     setStatusBar(StatusBar.IDLE);
   } else {
     setStatusBar(StatusBar.JUMP);
   }
 
-  isActive = isActive;
-  vscode.commands.executeCommand("setContext", "lumpat.jump-mode", isActive);
+  isActive = value;
+
+  vscode.commands.executeCommand("setContext", "lumpat.jump-mode", value);
 }
 
 function disposeDecorations() {
@@ -254,7 +255,9 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function close(editor: vscode.TextEditor) {
-    reset(editor);
+    if (isActive) {
+      reset(editor);
+    }
   }
 
   // EVENTS

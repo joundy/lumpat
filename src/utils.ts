@@ -38,49 +38,88 @@ export function generatePermutations(
   return results;
 }
 
-// expensive, TODO: optimize this function
+/**
+ * Find the index of the position closest to the target position
+ * Optimized version using early termination and manhattan distance
+ */
 export const findClosestIndex = (
   target: vscode.Position,
   positions: vscode.Position[]
-): number =>
-  positions.reduce(
-    (closest, pos, i) => {
-      const diff =
-        Math.abs(target.line - pos.line) * 1000 +
-        Math.abs(target.character - pos.character);
-      return diff < closest.diff ? { diff, index: i } : closest;
-    },
-    { diff: Infinity, index: -1 }
-  ).index;
+): number => {
+  if (positions.length === 0) {
+    return -1;
+  }
+  if (positions.length === 1) {
+    return 0;
+  }
+
+  let closestIndex = 0;
+  let minDiff = Infinity;
+
+  // Use manhattan distance for efficiency
+  for (let i = 0; i < positions.length; i++) {
+    const pos = positions[i];
+    // Prioritize line difference over character difference
+    const lineDiff = Math.abs(target.line - pos.line);
+
+    // Early termination - if we're on the same line, this is likely the best match
+    if (lineDiff === 0) {
+      const charDiff = Math.abs(target.character - pos.character);
+      if (charDiff === 0) {
+        return i; // Exact match, return immediately
+      }
+
+      const diff = charDiff;
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    } else {
+      const charDiff = Math.abs(target.character - pos.character);
+      const diff = lineDiff * 1000 + charDiff; // Line difference is weighted more heavily
+
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+  }
+
+  return closestIndex;
+};
 
 export function getVisibleTexts(
   editor: vscode.TextEditor
 ): VisibleTexts | null {
   const visibleRanges = editor.visibleRanges;
-  let visibleTexts: string[] = [];
 
   if (visibleRanges.length === 0) {
     return null;
   }
 
-  for (
-    let i = visibleRanges[0].start.line;
-    i <= visibleRanges[0].end.line;
-    i++
-  ) {
-    const text = editor.document.lineAt(i).text;
-    visibleTexts.push(text);
+  // Get the first visible range (most important one)
+  const visibleRange = visibleRanges[0];
+  const startLine = visibleRange.start.line;
+  const endLine = visibleRange.end.line;
+
+  // Pre-allocate array with exact size needed
+  const lineCount = endLine - startLine + 1;
+  const visibleTexts = new Array<string>(lineCount);
+
+  // Batch process visible lines
+  for (let i = 0; i < lineCount; i++) {
+    visibleTexts[i] = editor.document.lineAt(startLine + i).text;
   }
 
   return {
     texts: visibleTexts,
     start: {
-      line: visibleRanges[0].start.line,
-      character: visibleRanges[0].start.character,
+      line: startLine,
+      character: visibleRange.start.character,
     },
     end: {
-      line: visibleRanges[0].end.line,
-      character: visibleRanges[0].end.character,
+      line: endLine,
+      character: visibleRange.end.character,
     },
   };
 }
