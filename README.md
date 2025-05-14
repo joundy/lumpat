@@ -41,13 +41,13 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 Lumpat provides several customization options through VSCode settings:
 
-| Setting                         | Description                                            | Default                        |
-| ------------------------------- | ------------------------------------------------------ | ------------------------------ | ----------- | -------- | ----- |
-| `lumpat.chars`                  | Characters used for jump labels                        | `"asdghklqwertyuiopzxcvbnmfj"` |
-| `lumpat.backgroundColor`        | Background color for jump mode                         | `"#515878"`                    |
-| `lumpat.highlightColor`         | Highlight color for jump labels                        | `"#0db3d0"`                    |
-| `lumpat.highlightColorPriority` | Priority highlight color for jump labels               | `"#f70078"`                    |
-| `lumpat.regexPattern`           | Regular expression pattern for matching jump positions | `"(\b\w)                       | (\B(?=[A-Z] | [#_]\w)) | \b$"` |
+| Setting                         | Description                                            | Default                          |
+| ------------------------------- | ------------------------------------------------------ | -------------------------------- |
+| `lumpat.chars`                  | Characters used for jump labels                        | `"asdghklqwertyuiopzxcvbnmfj"`   |
+| `lumpat.backgroundColor`        | Background color for jump mode                         | `"#515878"`                      |
+| `lumpat.highlightColor`         | Highlight color for jump labels                        | `"#0db3d0"`                      |
+| `lumpat.highlightColorPriority` | Priority highlight color for jump labels               | `"#f70078"`                      |
+| `lumpat.regexPattern`           | Regular expression pattern for matching jump positions | "(\\b\\w)|(\\B(?=[A-Z]|[#_]\\w))|\\b$" |
 
 You can customize these settings in your VSCode settings.json file or through the Settings UI.
 
