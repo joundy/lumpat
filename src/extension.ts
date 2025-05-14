@@ -64,16 +64,16 @@ function disposeDecorations() {
   decorations = [];
 }
 
-function reset(editor?: vscode.TextEditor, deactivate = false) {
+function reset(deactivate = false) {
   setStatusBar(StatusBar.IDLE);
   setActive(false);
 
-  if (editor) {
+  vscode.window.visibleTextEditors.forEach((editor) => {
     editor.setDecorations(backgroundCharDec, []);
     for (let i = 0; i < decorations.length; i++) {
       editor.setDecorations(decorations[i], []);
     }
-  }
+  });
 
   if (deactivate) {
     backgroundCharDec.dispose();
@@ -220,7 +220,7 @@ function listenChar(key: string) {
     }
   }
 
-  reset(editor);
+  reset();
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -232,7 +232,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   function jump(editor: vscode.TextEditor) {
     if (isActive) {
-      reset(editor);
+      reset();
       return;
     }
 
@@ -254,9 +254,9 @@ export function activate(context: vscode.ExtensionContext) {
     setActive(true);
   }
 
-  function close(editor: vscode.TextEditor) {
+  function close() {
     if (isActive) {
-      reset(editor);
+      reset();
     }
   }
 
@@ -281,14 +281,14 @@ export function activate(context: vscode.ExtensionContext) {
       if (!editor) {
         return;
       }
-      close(editor);
+      close();
     }
   );
   context.subscriptions.push(disposableClose);
 
   const disposableOnScroll = vscode.window.onDidChangeTextEditorVisibleRanges(
-    async (event) => {
-      close(event.textEditor);
+    async () => {
+      close();
     }
   );
   context.subscriptions.push(disposableOnScroll);
@@ -303,6 +303,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  const editor = vscode.window.activeTextEditor;
-  reset(editor, true);
+  reset(true);
 }
