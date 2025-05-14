@@ -3,12 +3,18 @@
 "Lumpat" or "Mlumpat" in Javanese means "jump."\
 A VS Code extension that enhances text navigation with quick jump-to-highlight functionality.
 
+### Single column jump (lumpat.jump or shift + enter)
+
+![Image](https://github.com/user-attachments/assets/9f1ce19d-6347-4a9d-8d27-a75c09533a1b)
+
+### Multiple column jump (lumpat.jumpMulti or ctrl + shift + enter)
+
 ![Image](https://github.com/user-attachments/assets/9f1ce19d-6347-4a9d-8d27-a75c09533a1b)
 
 ## Features
 
 - Quick navigation through text using keyboard shortcuts
-- Visual highlighting system that shows jump targets
+- Visual highlighting system that shows jump targets, multiple columns are supported
 - Efficient movement without using the mouse
 - Support vim extension
 
@@ -24,23 +30,24 @@ A VS Code extension that enhances text navigation with quick jump-to-highlight f
 
 ## Default Keyboard Shortcuts
 
-| Shortcut | Command | Description |
-|----------|---------|-------------|
-| `Shift + Enter` | `lumpat.jump` | Activate jump mode and highlight jump targets |
-| `Escape` | `lumpat.close` | Exit jump mode |
-| `a-z` | `lumpat.[key]` | Jump to the highlighted location marked with that letter when jump-mode is active |
+| Shortcut               | Command            | Description                                                                       |
+| ---------------------- | ------------------ | --------------------------------------------------------------------------------- |
+| `Shift + Enter`        | `lumpat.jump`      | Activate jump mode and highlight jump targets                                     |
+| `Ctrl + Shift + Enter` | `lumpat.jumpMulti` | Activate multiple column jump mode and highlight jump targets                     |
+| `Escape`               | `lumpat.close`     | Exit jump mode                                                                    |
+| `a-z`                  | `lumpat.[key]`     | Jump to the highlighted location marked with that letter when jump-mode is active |
 
 ## Configuration
 
 Lumpat provides several customization options through VSCode settings:
 
-| Setting | Description | Default |
-|---------|-------------|--------|
-| `lumpat.chars` | Characters used for jump labels | `"asdghklqwertyuiopzxcvbnmfj"` |
-| `lumpat.backgroundColor` | Background color for jump mode | `"#515878"` |
-| `lumpat.highlightColor` | Highlight color for jump labels | `"#0db3d0"` |
-| `lumpat.highlightColorPriority` | Priority highlight color for jump labels | `"#f70078"` |
-| `lumpat.regexPattern` | Regular expression pattern for matching jump positions | `"(\b\w)|(\B(?=[A-Z]|[#_]\w))|\b$"` |
+| Setting                         | Description                                            | Default                        |
+| ------------------------------- | ------------------------------------------------------ | ------------------------------ | ----------- | -------- | ----- |
+| `lumpat.chars`                  | Characters used for jump labels                        | `"asdghklqwertyuiopzxcvbnmfj"` |
+| `lumpat.backgroundColor`        | Background color for jump mode                         | `"#515878"`                    |
+| `lumpat.highlightColor`         | Highlight color for jump labels                        | `"#0db3d0"`                    |
+| `lumpat.highlightColorPriority` | Priority highlight color for jump labels               | `"#f70078"`                    |
+| `lumpat.regexPattern`           | Regular expression pattern for matching jump positions | `"(\b\w)                       | (\B(?=[A-Z] | [#_]\w)) | \b$"` |
 
 You can customize these settings in your VSCode settings.json file or through the Settings UI.
 
