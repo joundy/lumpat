@@ -159,7 +159,7 @@ function setNextHighlight(editor: vscode.TextEditor) {
       const charPosition = charMap[hint];
       const newPosition = new vscode.Position(
         charPosition.line,
-        charPosition.character + listenChar.length
+        charPosition.character + listenedChar.length
       );
 
       const range = new vscode.Range(
